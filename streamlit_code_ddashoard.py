@@ -259,6 +259,78 @@ fig = px.pie(
 
 st.plotly_chart(fig,use_container_width=True)
 
+# ------------------------------------------------
+# SANKEY FLOW: CONTENT LIFECYCLE
+# ------------------------------------------------
+
+st.subheader("Content Flow: Upload → Create → Publish")
+
+labels = ["Uploaded","Created","Published"]
+
+source = [0,1]
+target = [1,2]
+values = [total_uploaded,total_published]
+
+fig = go.Figure(data=[go.Sankey(
+    node=dict(
+        pad=15,
+        thickness=20,
+        label=labels,
+        color=["#B0BEC5","#0055FF","#0066FF"]
+    ),
+    link=dict(
+        source=source,
+        target=target,
+        value=values,
+        color=["#0055FF","#FF4444"]
+    )
+)])
+
+st.plotly_chart(fig,use_container_width=True)
+
+# ------------------------------------------------
+# CHANNEL × INPUT TYPE HEATMAP
+# ------------------------------------------------
+
+st.subheader("Channel × Input Type Publish Efficiency")
+
+pivot = df_channel.pivot_table(
+    values="Published Count",
+    index="Channel",
+    columns="Input Type",
+    aggfunc="sum"
+)
+
+fig = px.imshow(
+    pivot,
+    text_auto=True,
+    color_continuous_scale="Blues"
+)
+
+st.plotly_chart(fig,use_container_width=True)
+
+# ------------------------------------------------
+# WASTE VS EFFICIENCY FRONTIER
+# ------------------------------------------------
+
+st.subheader("Channel Waste vs Publish Efficiency")
+
+df_channel["Publish Rate"] = df_channel["Published Count"] / df_channel["Created Count"]
+df_channel["Waste"] = df_channel["Created Count"] - df_channel["Published Count"]
+
+fig = px.scatter(
+    df_channel,
+    x="Waste",
+    y="Publish Rate",
+    size="Uploaded Count",
+    color="Channel",
+    hover_name="Channel",
+)
+
+st.plotly_chart(fig,use_container_width=True)
+
+
+'''
 st.caption("Frammer AI Championship – Optimization KPI Dashboard")
 st.title("🚀 Frammer AI – AI Optimization Effectiveness Dashboard")
 st.caption("Client: CLIENT 1 | Mar 2025 – Feb 2026")
@@ -492,4 +564,6 @@ else:
 st.dataframe(results)
 
 st.caption("Frammer AI Championship Dashboard – Advanced Visual Analytics")
+'''
+
 
